@@ -4,7 +4,11 @@
 
 1. Clone the repository
 2. Create an .env file in the root directory based on the .env.template file
-3. Run the following commands in the terminal:
+3. If project was cloned execute the following commands:
+```bash
+git submodule update --init --recursive
+``` 
+4. Run the following commands in the terminal:
 ```bash
 docker compose up --build
 ```
