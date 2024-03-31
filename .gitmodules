@@ -7,3 +7,6 @@
 [submodule "orders-microservices"]
 	path = orders-microservices
 	url = https://github.com/GerardoICS-Microservices/orders-microservice.git
+[submodule "payments-microservices"]
+	path = payments-microservices
+	url = https://github.com/GerardoICS-Microservices/payments-microservices.git

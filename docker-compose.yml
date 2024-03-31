@@ -56,3 +56,20 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: ordersdb
       
+
+#? ==================================
+#? PAYMENTS MICROSERVICE
+#? ==================================
+  payments-microservices:
+    container_name: payments-microservices
+    build: ./payments-microservices
+    volumes:
+      - ./payments-microservices/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=${PAYMENTS_MICROSERVICES_PORT}
+      - NATS_SERVERS=nats://nats-server:4222
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_ENDPOINT_SECRET=${STRIPE_ENDPOINT_SECRET}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
