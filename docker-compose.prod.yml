@@ -8,22 +8,21 @@ services:
 
   nats-server:
     image: nats:latest
-    ports:
-      - '8222:8222'
+
 
   #? ==================================
   #? CLIENT GATEWAY
   #? ==================================
 
   client-gateway:
-    build: ./client-gateway
-    ports:
-      - '${CLIENT_GATEWAY_PORT}:3000'
-    volumes:
-      - ./client-gateway/src:/usr/src/app/src
-    command: npm run start:dev
+    build: 
+      context: ./client-gateway
+      dockerfile: dockerfile.prod
+    image: client-gateway-prod
+    # ports:
+    #   - '${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}'
     environment:
-      - PORT=3000
+      - PORT=${CLIENT_GATEWAY_PORT}
       - NATS_SERVERS=nats://nats-server:4222
 
   #? ==================================
@@ -31,12 +30,12 @@ services:
   #? ==================================
 
   products-microservices:
-    build: ./products-microservices
-    volumes:
-      - ./products-microservices/src:/usr/src/app/src
-    command: npm run start:dev
+    build: 
+      context: ./products-microservices
+      dockerfile: dockerfile.prod
+    image: products-microservices-prod
     environment:
-      - PORT=3001
+      - PORT=3000
       - NATS_SERVERS=nats://nats-server:4222
       - DATABASE_URL=file:./dev.db
 
@@ -45,16 +44,16 @@ services:
   #? ==================================
 
   orders-microservices:
-    depends_on:
-      - orders-db
-    build: ./orders-microservices
-    volumes:
-      - ./orders-microservices/src:/usr/src/app/src
-    command: npm run start:dev
+    build: 
+      context: ./orders-microservices
+      dockerfile: dockerfile.prod
+      args:
+        ORDERS_DATABASE_URL: ${ORDERS_DATABASE_URL}
+    image: orders-microservices-prod
     environment:
-      - PORT=3002
+      - PORT=3000
       - NATS_SERVERS=nats://nats-server:4222
-      - DATABASE_URL=postgresql://postgres:postgres@orders-db:5432/ordersdb?schema=public
+      - DATABASE_URL=${ORDERS_DATABASE_URL}
 
   orders-db:
     container_name: orders-database
@@ -73,13 +72,12 @@ services:
   #? AUTH MICROSERVICE
   #? ==================================
   auth-microservices:
-    container_name: auth-microservices
-    build: ./auth-microservices
-    volumes:
-      - ./auth-microservices/src:/usr/src/app/src
-    command: npm run start:dev
+    build: 
+      context: ./auth-microservices
+      dockerfile: dockerfile.prod
+    image: auth-microservices-prod
     environment:
-      - PORT=3004
+      - PORT=3000
       - NATS_SERVERS=nats://nats-server:4222
       - DATABASE_URL=${AUTH_DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
@@ -89,10 +87,10 @@ services:
   #? ==================================
   payments-microservices:
     container_name: payments-microservices
-    build: ./payments-microservices
-    volumes:
-      - ./payments-microservices/src:/usr/src/app/src
-    command: npm run start:dev
+    build: 
+      context: ./payments-microservices
+      dockerfile: dockerfile.prod
+    image: payments-microservices-prod
     ports:
       - ${PAYMENTS_MICROSERVICES_PORT}:${PAYMENTS_MICROSERVICES_PORT}
     environment:
